@@ -1,6 +1,7 @@
 # Docker Desktop: GitLab SSH Key
 
 #### Visit: http://localhost:8000/dashboard/projects --->click: Edit profile --->click: Access --->click: SSH keys --->click: Add a new key
+---
 #### Powershell open koro ar folder create koro
 ```bash
 mkdir gitlab
@@ -25,4 +26,12 @@ Enter press
 ```bash
 Enter press
 ```
+---
+#### sob thik thak thakle terminal e output ashbe
+```bash
+Your identification has been saved in C:\Users\User\.ssh\gitlab_ed25519
+Your public key has been saved in C:\Users\User\.ssh\gitlab_ed25519.pub
+```
+<img width="671" height="351" alt="image" src="https://github.com/user-attachments/assets/f97f3b3b-8f75-4d40-900b-2d8efed9a177" />
+
 ---
