@@ -11,4 +11,10 @@ cd gitlab
 ```bash
 ssh-keygen -t ed25519 -C "omar.labib.softwareengineer@gmail.com"
 ```
+> Generating public/private ed25519 key pair.
+Enter file in which to save the key (C:\Users\User/.ssh/id_ed25519):
+> file path daw
+```bash
+C:\Users\User\.ssh\
+```
 ---
