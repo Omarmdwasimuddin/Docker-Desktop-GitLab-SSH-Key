@@ -1,37 +1,102 @@
-# Docker Desktop: GitLab SSH Key
+# Docker Desktop: GitLab SSH Key Setup
+SSH key generate করে local Docker Desktop-এ চলা GitLab instance-এর account-এ add করা, তারপর SSH দিয়ে repository clone করা — পুরো process ধাপে ধাপে এখানে দেওয়া আছে।
 
-#### Visit: http://localhost:8000/dashboard/projects --->click: Edit profile --->click: Access --->click: SSH keys --->click: Add a new key
 ---
-#### Powershell open koro ar folder create koro
+
+## Step 1: GitLab-এ SSH Key Add করার জায়গা খুঁজে বের করা
+Local GitLab dashboard-এ গিয়ে SSH key add করার option বের করো:
+
+**http://localhost:8000/dashboard/projects** → Click: **Edit profile** → Click: **Access** → Click: **SSH keys** → Click: **Add new key**
+
+---
+
+## Step 2: PowerShell-এ Folder Create করা
+PowerShell open করে এই command গুলো run করো — একটা `gitlab` folder create হবে এবং সেই folder-এ ঢুকবে:
+
 ```bash
 mkdir gitlab
 cd gitlab
 ```
-#### ssh key generate koro
-> Note: email dite hobe gitlab er email
+
+---
+
+## Step 3: SSH Key Generate করা
+এই command দিয়ে SSH key pair generate করো (email তোমার GitLab account-এর email দিয়ে replace করতে পারো):
+
 ```bash
 ssh-keygen -t ed25519 -C "omar.labib.softwareengineer@gmail.com"
 ```
-#### Generating public/private ed25519 key pair.
-#### Enter file in which to save the key (C:\Users\User/.ssh/id_ed25519):
-#### file path daw
+
+Command run করার পর কিছু prompt আসবে, সেগুলো এভাবে handle করতে হবে:
+
+**Prompt 1:**
+```
+Generating public/private ed25519 key pair.
+Enter file in which to save the key (C:\Users\User/.ssh/id_ed25519):
+```
+এখানে file path দিয়ে দাও:
 ```bash
 C:\Users\User\.ssh\
 ```
-#### Enter passphrase (empty for no passphrase):
-```bash
-Enter press
+
+**Prompt 2:**
 ```
-#### Enter same passphrase again:
-```bash
-Enter press
+Enter passphrase (empty for no passphrase):
 ```
+Enter press করো (খালি রাখো)।
+
+**Prompt 3:**
+```
+Enter same passphrase again:
+```
+আবার Enter press করো।
+
 ---
-#### sob thik thak thakle terminal e output ashbe
-```bash
+
+## Step 4: Key কোথায় Save হয়েছে দেখা
+উপরের command গুলো ঠিকমতো complete হলে, terminal-এ এই রকম output আসবে — এটা দিয়ে বোঝা যাবে key কোথায় save হয়েছে:
+
+```
 Your identification has been saved in C:\Users\User\.ssh\gitlab_ed25519
 Your public key has been saved in C:\Users\User\.ssh\gitlab_ed25519.pub
 ```
+
 <img width="671" height="351" alt="image" src="https://github.com/user-attachments/assets/f97f3b3b-8f75-4d40-900b-2d8efed9a177" />
 
 ---
+
+## Step 5: Public Key Copy করে GitLab-এ Paste করা
+1. `gitlab_ed25519.pub` file-টা Notepad দিয়ে open করো
+2. Full content copy করো (এটা হচ্ছে তোমার **public key**, private key না)
+3. Local GitLab-এর "SSH Key" input box-এ paste করো
+4. Click করো: **Add key**
+
+> ⚠️ **মনে রাখবে:** শুধু `.pub` extension-ওয়ালা file-এর content paste করবে। Private key (`gitlab_ed25519`, extension ছাড়া file) কখনো কাউকে share করবে না।
+
+---
+
+## Step 6: Test করা — Repository Clone করা
+এখন test করে দেখা যাবে SSH key ঠিকমতো কাজ করছে কিনা।
+
+1. Local GitLab-এ গিয়ে তোমার project-এ visit করো (যেমন: **http://localhost:8000/<group>/<project>**)
+2. Click: **Code** → **Clone with SSH** → copy করো clone URL-টা
+3. PowerShell-এ project folder-এ গিয়ে (যেমন: `PS C:\Users\User\Desktop\gitlab>`) এই command run করো:
+
+```bash
+git clone git@localhost:<group>/<project>.git
+```
+
+✅ Command successful হলে, project SSH দিয়ে clone হয়ে যাবে — মানে SSH key setup ঠিকমতো কাজ করছে।
+
+---
+
+## Quick Summary
+
+| Step | কাজ |
+|------|-----|
+| 1 | Local GitLab-এ SSH Keys page-এ যাওয়া |
+| 2 | Local-এ `gitlab` folder create করা |
+| 3 | `ssh-keygen` দিয়ে key pair generate করা |
+| 4 | Key file path check করা |
+| 5 | Public key (`.pub`) local GitLab-এ paste করে add করা |
+| 6 | SSH দিয়ে repo clone করে test করা |
