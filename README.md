@@ -17,4 +17,12 @@ ssh-keygen -t ed25519 -C "omar.labib.softwareengineer@gmail.com"
 ```bash
 C:\Users\User\.ssh\
 ```
+#### Enter passphrase (empty for no passphrase):
+```bash
+Enter press
+```
+#### Enter same passphrase again:
+```bash
+Enter press
+```
 ---
