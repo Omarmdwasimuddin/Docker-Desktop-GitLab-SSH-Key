@@ -65,7 +65,51 @@ Your public key has been saved in C:\Users\User\.ssh\gitlab_ed25519.pub
 
 ---
 
-## Step 5: Public Key Copy করে GitLab-এ Paste করা
+## Step 5: SSH Config File Setup (একাধিক key একসাথে manage করার জন্য)
+
+একের বেশি SSH key থাকলে (GitHub, GitLab.com, local Docker GitLab) config file ছাড়া SSH client confuse হয়ে যায় কোনটা use করবে, এবং বারবার `-i` flag দিয়ে key specify করা লাগে। এটা এড়াতে একটা `config` file বানানো হয়।
+
+`C:\Users\User\.ssh\config` file create/edit করো (extension ছাড়া, শুধু নাম `config`):
+
+```bash
+notepad C:\Users\User\.ssh\config
+```
+
+এই content paste করো:
+
+```
+Host gitlab.com
+    HostName gitlab.com
+    User git
+    IdentityFile C:/Users/User/.ssh/gitlab_ed25519
+    IdentitiesOnly yes
+
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile C:/Users/User/.ssh/id_ed25519
+    IdentitiesOnly yes
+
+Host my-gitlab-server
+    HostName localhost
+    Port 2222
+    User git
+    IdentityFile C:/Users/User/.ssh/gitlab_local_ed25519
+    IdentitiesOnly yes
+```
+
+**কী কী করে এই config:**
+- `Host` → alias, terminal-এ এই নামটা দিয়ে reference করবে (আসল hostname না)
+- `HostName` → আসল server address
+- `IdentityFile` → কোন key ব্যবহার হবে সেটা fix করে দেয়, ফলে SSH agent wrong key try করে error দেয় না
+- `IdentitiesOnly yes` → শুধু specified key ব্যবহার হবে, অন্য কোনো loaded key try করবে না (multiple key থাকলে এটা must)
+- `Port 2222` → Docker Desktop যদি local GitLab-এর SSH port 22 না হয়ে অন্য কিছুতে (যেমন 2222) expose করে, তাহলে এইটা দরকার — নাহলে connection refuse হবে
+
+> ⚠️ **মনে রাখবে:** Docker container-এর actual SSH port check করে নিতে হবে (`docker ps` দিয়ে port mapping দেখো, যেমন `0.0.0.0:2222->22/tcp`)। যেটাই হোক, config-এর `Port` value সেটার সাথে match করতে হবে। এই document-এ `2222` এবং key filename `gitlab_local_ed25519` example হিসেবে দেওয়া — নিজের actual port এবং Step 4-এ generate হওয়া key-এর নাম (`gitlab_ed25519`) অনুযায়ী adjust করে নাও।
+
+---
+
+## Step 6: Public Key Copy করে GitLab-এ Paste করা
 1. `gitlab_ed25519.pub` file-টা Notepad দিয়ে open করো
 2. Full content copy করো (এটা হচ্ছে তোমার **public key**, private key না)
 3. Local GitLab-এর "SSH Key" input box-এ paste করো
@@ -75,15 +119,15 @@ Your public key has been saved in C:\Users\User\.ssh\gitlab_ed25519.pub
 
 ---
 
-## Step 6: Test করা — Repository Clone করা
+## Step 7: Test করা — Repository Clone করা
 এখন test করে দেখা যাবে SSH key ঠিকমতো কাজ করছে কিনা।
 
 1. Local GitLab-এ গিয়ে তোমার project-এ visit করো (যেমন: **http://localhost:8000/<group>/<project>**)
 2. Click: **Code** → **Clone with SSH** → copy করো clone URL-টা
-3. PowerShell-এ project folder-এ গিয়ে (যেমন: `PS C:\Users\User\Desktop\gitlab>`) এই command run করো:
+3. PowerShell-এ project folder-এ গিয়ে (যেমন: `PS C:\Users\User\Desktop\gitlab>`) এই command run করো — এখানে `localhost` এর জায়গায় config-এ define করা alias `my-gitlab-server` ব্যবহার করো, যাতে port এবং correct key automatically apply হয়:
 
 ```bash
-git clone git@localhost:<group>/<project>.git
+git clone git@my-gitlab-server:<group>/<project>.git
 ```
 
 ✅ Command successful হলে, project SSH দিয়ে clone হয়ে যাবে — মানে SSH key setup ঠিকমতো কাজ করছে।
@@ -98,5 +142,6 @@ git clone git@localhost:<group>/<project>.git
 | 2 | Local-এ `gitlab` folder create করা |
 | 3 | `ssh-keygen` দিয়ে key pair generate করা |
 | 4 | Key file path check করা |
-| 5 | Public key (`.pub`) local GitLab-এ paste করে add করা |
-| 6 | SSH দিয়ে repo clone করে test করা |
+| 5 | SSH config file বানিয়ে host alias + port + key mapping set করা |
+| 6 | Public key (`.pub`) local GitLab-এ paste করে add করা |
+| 7 | Config alias ব্যবহার করে SSH দিয়ে repo clone করে test করা |
